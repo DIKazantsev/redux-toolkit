@@ -1,24 +1,65 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import RecipeItem from './components/recipe-item/RecipeItem';
+import User from './components/user/user';
+import { useGetRecipesQuery } from './store/api/api';
+import CreateRecipe from './components/create-recipe/CreateRecipe';
+
 
 function App() {
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [queryTerm, setQueryTerm] = useState('');
+
+
+  const { isLoading, data, error } = useGetRecipesQuery(
+    queryTerm,
+    {
+      //pollingInterval: 1000
+      //skip:
+
+    });
+
+  const handleSearch = () => {
+    setQueryTerm(searchTerm)
+
+  }
+
+  console.log('isLoading', isLoading);
+  console.log('data', data);
+  console.log('error', error);
+
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <User />
+      <CreateRecipe />
+      <div>
+        <p>If you wanna find:</p>
+        <input
+          type='search'
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          placeholder='Enter search'>
+
+        </input>
+        <button onClick={handleSearch}>Search</button>
+      </div>
+      {isLoading ? <div>Loading..</div> :
+        data?.map((recipe: any) =>
+          <RecipeItem key={recipe.id} recipe={recipe} />
+        )}
+      {/* <RecipeItem recipe={{
+        id: 1,
+        name: 'Лазанья'
+      }} />
+      <RecipeItem recipe={{
+        id: 2,
+        name: 'Каша'
+      }} />
+      <RecipeItem recipe={{
+        id: 3,
+        name: 'Суп'
+      }} /> */}
     </div>
   );
 }
